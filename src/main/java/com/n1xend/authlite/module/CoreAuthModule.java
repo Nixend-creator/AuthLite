@@ -2,8 +2,10 @@ package com.n1xend.authlite.module;
 
 import com.n1xend.authlite.AuthLite;
 import com.n1xend.authlite.command.*;
+import com.n1xend.authlite.listener.BruteForceListener;
 import com.n1xend.authlite.listener.PlayerJoinListener;
 import com.n1xend.authlite.listener.ProtectionListener;
+import com.n1xend.authlite.listener.SessionLoggerListener;
 import org.bukkit.Bukkit;
 
 public class CoreAuthModule implements Module {
