@@ -3,6 +3,7 @@ package com.n1xend.authlite.module;
 import com.n1xend.authlite.AuthLite;
 import com.n1xend.authlite.command.*;
 import com.n1xend.authlite.listener.PlayerJoinListener;
+import com.n1xend.authlite.listener.ProtectionListener;
 import org.bukkit.Bukkit;
 
 public class CoreAuthModule implements Module {
@@ -26,5 +27,6 @@ public class CoreAuthModule implements Module {
         plugin.getCommand("auth").setExecutor(new AuthCommand(plugin));
         plugin.getCommand("authsessions").setExecutor(new AuthSessionsCommand(plugin));
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(plugin), plugin);
+        Bukkit.getPluginManager().registerEvents(new ProtectionListener(plugin), plugin);
     }
 }
