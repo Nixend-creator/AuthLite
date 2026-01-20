@@ -28,5 +28,7 @@ public class CoreAuthModule implements Module {
         plugin.getCommand("authsessions").setExecutor(new AuthSessionsCommand(plugin));
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(plugin), plugin);
         Bukkit.getPluginManager().registerEvents(new ProtectionListener(plugin), plugin);
+        Bukkit.getPluginManager().registerEvents(new BruteForceListener(plugin), plugin);
+        Bukkit.getPluginManager().registerEvents(new SessionLoggerListener(plugin), plugin);
     }
 }
