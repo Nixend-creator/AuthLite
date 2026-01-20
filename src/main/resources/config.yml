@@ -1,0 +1,45 @@
+language: en
+auto-detect-language: false
+
+login-timeout: 60
+password-change-cooldown: 300
+
+auto-login:
+  enabled: true
+  duration-hours: 24
+
+storage:
+  type: sqlite
+  mysql:
+    host: "127.0.0.1"
+    port: 3306
+    database: "authlite"
+    username: "auth"
+    password: "secure_password"
+    table: "players"
+    use-ssl: false
+
+security:
+  max-accounts-per-ip: 5
+  geoip:
+    enabled: false
+    blocked-countries: ["CN", "IR", "KP"]
+    database-path: "GeoLite2-Country.mmdb"
+
+logging:
+  session-logging: true
+  session-log:
+    max-size-mb: 10
+    max-age-days: 7
+    rotation-enabled: true
+
+modules:
+  core-auth: true
+  auto-login: true
+  password-change: true
+  brute-force-protection: true
+  audit-logging: true
+  humanity-check: true
+  ssrf-protection: true
+  emergency-session-revoke: true
+  ip-account-limit: true
