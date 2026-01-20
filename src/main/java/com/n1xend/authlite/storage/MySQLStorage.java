@@ -45,30 +45,29 @@ public class MySQLStorage implements StorageProvider {
     }
 
     private void createTables() {
-        try (Connection conn = dataSource.getConnection();
-             Statement stmt = conn.createStatement()) {
-            stmt.execute("""
-                CREATE TABLE IF NOT EXISTS `""" + tableName + """` (
-                    `uuid` CHAR(36) NOT NULL PRIMARY KEY,
-                    `password_hash` TEXT NOT NULL,
-                    `auto_login_token` VARCHAR(64) NULL,
-                    `auto_login_expires` BIGINT NULL,
-                    `auto_login_ip_hash` VARCHAR(64) NULL,
-                    `ip_hash` VARCHAR(64) NOT NULL,
-                    `created_at` BIGINT NOT NULL
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-                """);
+    try (Connection conn = dataSource.getConnection();
+         Statement stmt = conn.createStatement()) {
+        String tableSql = "CREATE TABLE IF NOT EXISTS `" + tableName + "` (" +
+            "`uuid` CHAR(36) NOT NULL PRIMARY KEY," +
+            "`password_hash` TEXT NOT NULL," +
+            "`auto_login_token` VARCHAR(64) NULL," +
+            "`auto_login_expires` BIGINT NULL," +
+            "`auto_login_ip_hash` VARCHAR(64) NULL," +
+            "`ip_hash` VARCHAR(64) NOT NULL," +
+            "`created_at` BIGINT NOT NULL" +
+            ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 
-            stmt.execute("""
-                CREATE TABLE IF NOT EXISTS `ip_account_count` (
-                    `ip_hash` VARCHAR(64) NOT NULL PRIMARY KEY,
-                    `count` INT NOT NULL DEFAULT 1
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-                """);
-        } catch (SQLException e) {
-            logger.severe("Failed to create MySQL tables: " + e.getMessage());
-        }
+        String ipCountSql = "CREATE TABLE IF NOT EXISTS `ip_account_count` (" +
+            "`ip_hash` VARCHAR(64) NOT NULL PRIMARY KEY," +
+            "`count` INT NOT NULL DEFAULT 1" +
+            ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
+
+        stmt.execute(tableSql);
+        stmt.execute(ipCountSql);
+    } catch (SQLException e) {
+        logger.severe("Failed to create MySQL tables: " + e.getMessage());
     }
+}
 
     @Override
     public boolean hasAccount(String uuid) {
