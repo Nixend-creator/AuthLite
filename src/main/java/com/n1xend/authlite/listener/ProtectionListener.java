@@ -16,10 +16,9 @@ public class ProtectionListener implements Listener {
         this.plugin = plugin;
     }
 
-    private void denyIfNotLoggedIn(PlayerEvent event, String messageKey) {
-        if (!plugin.isLoggedIn(event.getPlayer().getUniqueId())) {
-            event.getPlayer().sendMessage(mm.deserialize(getPrefix() + "<red>" + getMessage(messageKey)));
-            event.setCancelled(true);
+    private void denyIfNotLoggedIn(Player player, String messageKey) {
+        if (!plugin.isLoggedIn(player.getUniqueId())) {
+            player.sendMessage(mm.deserialize(getPrefix() + "<red>" + getMessage(messageKey)));
         }
     }
 
@@ -36,36 +35,54 @@ public class ProtectionListener implements Listener {
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent e) {
-        denyIfNotLoggedIn(e, "not-logged-in");
+        if (!plugin.isLoggedIn(e.getPlayer().getUniqueId())) {
+            e.setCancelled(true);
+            denyIfNotLoggedIn(e.getPlayer(), "not-logged-in");
+        }
     }
 
     @EventHandler
     public void onCommand(PlayerCommandPreprocessEvent e) {
         String cmd = e.getMessage().toLowerCase();
         if (cmd.startsWith("/login") || cmd.startsWith("/register") || cmd.startsWith("/changepassword")) return;
-        denyIfNotLoggedIn(e, "not-logged-in");
+        if (!plugin.isLoggedIn(e.getPlayer().getUniqueId())) {
+            e.setCancelled(true);
+            denyIfNotLoggedIn(e.getPlayer(), "not-logged-in");
+        }
     }
 
     @EventHandler
     public void onInteract(PlayerInteractEvent e) {
-        denyIfNotLoggedIn(e, "not-logged-in");
+        if (!plugin.isLoggedIn(e.getPlayer().getUniqueId())) {
+            e.setCancelled(true);
+            denyIfNotLoggedIn(e.getPlayer(), "not-logged-in");
+        }
     }
 
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
         if (!e.getFrom().getBlock().equals(e.getTo().getBlock())) {
-            denyIfNotLoggedIn(e, "not-logged-in");
+            if (!plugin.isLoggedIn(e.getPlayer().getUniqueId())) {
+                e.setTo(e.getFrom());
+                denyIfNotLoggedIn(e.getPlayer(), "not-logged-in");
+            }
         }
     }
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent e) {
-        denyIfNotLoggedIn(e, "not-logged-in");
+        if (!plugin.isLoggedIn(e.getPlayer().getUniqueId())) {
+            e.setCancelled(true);
+            denyIfNotLoggedIn(e.getPlayer(), "not-logged-in");
+        }
     }
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent e) {
-        denyIfNotLoggedIn(e, "not-logged-in");
+        if (!plugin.isLoggedIn(e.getPlayer().getUniqueId())) {
+            e.setCancelled(true);
+            denyIfNotLoggedIn(e.getPlayer(), "not-logged-in");
+        }
     }
 
     @EventHandler
