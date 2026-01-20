@@ -1,0 +1,32 @@
+name: AuthLite
+version: '${project.version}'
+main: com.n1xend.authlite.AuthLite
+api-version: '1.21'
+authors: [N1xend]
+description: Minimalist, secure, modular authentication
+website: https://github.com/N1xend/AuthLite
+
+commands:
+  register:
+    description: Register account
+    usage: /<command> <password> <repeat>
+  login:
+    description: Log in to your account
+    usage: /<command> <password>
+  changepassword:
+    description: Change your password
+    usage: /<command> <old> <new> <repeat>
+  auth:
+    description: AuthLite management
+    usage: /<command> [reload|info|stats|sessions]
+  authsessions:
+    description: View session logs
+    usage: /<command> last [N]
+
+permissions:
+  authlite.reload:
+    description: Reload config
+    default: op
+  authlite.sessions:
+    description: View session logs
+    default: op
