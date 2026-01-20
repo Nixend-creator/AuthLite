@@ -11,7 +11,7 @@
 
     <name>AuthLite</name>
     <description>Minimalist, secure, modular authentication plugin for PaperMC</description>
-    <url>https://github.com/N1xend/AuthLite</url>
+    <url>https://github.com/Nixend-creator/AuthLite</url>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -31,30 +31,29 @@
             <id>papermc</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
-		<!-- Добавляем репозиторий для PlaceholderAPI -->
-    <repository>
-        <id>spigotmc</id>
-        <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-    </repository>
-    <repository>
-        <id>placeholderapi</id>
-        <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
-    </repository>
+        <repository>
+            <id>spigotmc</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>placeholderapi</id>
+            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+        </repository>
     </repositories>
 
     <dependencies>
-	<dependency>
-    <groupId>org.jetbrains</groupId>
-    <artifactId>annotations</artifactId>
-    <version>24.1.0</version>
-    <scope>provided</scope>
-</dependency>
-		<dependency>
-			<groupId>me.clip</groupId>
-			<artifactId>placeholderapi</artifactId>
-			<version>2.11.5</version>
-			<scope>provided</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>24.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>me.clip</groupId>
+            <artifactId>placeholderapi</artifactId>
+            <version>2.11.5</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
