@@ -1,4 +1,4 @@
-language: en
+language: ru
 auto-detect-language: false
 
 login-timeout: 60
@@ -43,3 +43,4 @@ modules:
   ssrf-protection: true
   emergency-session-revoke: true
   ip-account-limit: true
+  popular-plugins-integration: true
