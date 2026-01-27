@@ -22,20 +22,21 @@ public class PlayerJoinListener implements Listener {
 
         // Попытка автологина
         var autoLoginData = plugin.getStorage().getAutoLoginData(uuid);
-        if (autoLoginData != null) {
-            long now = System.currentTimeMillis();
-            if (now < autoLoginData.expiresAt) {
-                String currentIpHash = plugin.getStorage().hashIp(ip);
-                if (currentIpHash.equals(autoLoginData.ipHash)) {
-                    plugin.setLoggedIn(player.getUniqueId(), true);
-                    player.sendMessage(mm.deserialize(
-                        plugin.getConfig().getString("messages.prefix", "") +
-                        "<green>You have been automatically logged in!"
-                    ));
-                    return;
-                }
-            }
+        // PlayerJoinListener.java
+if (autoLoginData != null) {
+    long now = System.currentTimeMillis();
+    if (now < autoLoginData.expiresAt) {
+        String currentIpHash = plugin.getStorage().hashIp(ip);
+        if (currentIpHash.equals(autoLoginData.ipHash)) {
+            plugin.setLoggedIn(player.getUniqueId(), true);
+            
+            // ЕДИНСТВЕННОЕ сообщение — через локализацию
+            String msg = getLocalizedMessage(player, "auto-login-success");
+            player.sendMessage(mm.deserialize(msg));
+            return;
         }
+    }
+}
 
         // Обычный вход
         int timeout = plugin.getConfig().getInt("login-timeout", 60);

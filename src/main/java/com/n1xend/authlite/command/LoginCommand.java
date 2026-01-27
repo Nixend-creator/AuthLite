@@ -79,25 +79,36 @@ public class LoginCommand implements CommandExecutor {
 
     private String getLocalizedMessage(Player player, String key) {
         String lang = plugin.getConfig().getString("language", "en");
+
+        // Автоопределение языка (Paper 1.19+)
         if (plugin.getConfig().getBoolean("auto-detect-language", false)) {
-            String clientLang = player.locale().toString().toLowerCase();
-            if (clientLang.startsWith("ru")) lang = "ru";
-            else if (clientLang.startsWith("uk")) lang = "uk";
-            else if (clientLang.startsWith("de")) lang = "de";
-            else if (clientLang.startsWith("es")) lang = "es";
-            else if (clientLang.startsWith("fr")) lang = "fr";
-            else if (clientLang.startsWith("pt")) lang = "pt";
-            else if (clientLang.startsWith("it")) lang = "it";
-            else if (clientLang.startsWith("pl")) lang = "pl";
-            else if (clientLang.startsWith("tr")) lang = "tr";
-            else if (clientLang.startsWith("zh")) lang = "zh";
-            else if (clientLang.startsWith("ja")) lang = "ja";
+            try {
+                var locale = player.locale();
+                if (locale != null) {
+                    String clientLang = locale.toString().toLowerCase();
+                    if (clientLang.startsWith("ru")) lang = "ru";
+                    else if (clientLang.startsWith("uk")) lang = "uk";
+                    else if (clientLang.startsWith("de")) lang = "de";
+                    else if (clientLang.startsWith("es")) lang = "es";
+                    else if (clientLang.startsWith("fr")) lang = "fr";
+                    else if (clientLang.startsWith("pt")) lang = "pt";
+                    else if (clientLang.startsWith("it")) lang = "it";
+                    else if (clientLang.startsWith("pl")) lang = "pl";
+                    else if (clientLang.startsWith("tr")) lang = "tr";
+                    else if (clientLang.startsWith("zh")) lang = "zh";
+                    else if (clientLang.startsWith("ja")) lang = "ja";
+                }
+            } catch (Exception ignored) {
+                // Используем язык по умолчанию из конфига
+            }
         }
 
         File file = new File(plugin.getDataFolder(), "messages_" + lang + ".yml");
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+
         String msg = cfg.getString(key, "Missing translation for '" + key + "'");
         String prefix = cfg.getString("prefix", "");
-        return prefix + msg;
+
+        return msg.replace("%prefix%", prefix);
     }
 }
