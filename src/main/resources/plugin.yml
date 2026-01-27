@@ -1,5 +1,5 @@
 name: AuthLite
-version: '${project.version}'
+version: '1.0.0'
 main: com.n1xend.authlite.AuthLite
 api-version: '1.21'
 authors: [N1xend]
