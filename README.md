@@ -19,6 +19,14 @@ Support: **Paper 1.21.1+ | Java 21**
 - ✅ GeoIP blocking
 - ✅ Modular architecture
 
+## Commands
+
+- `/register <password> <repeat>` — register account
+- `/login <password>` — log in
+- `/changepassword <old> <new> <repeat>` — change password
+- `/auth reload` — reload config (OP only)
+- `/auth sessions last [N]` — view session logs (OP only)
+
 ## Build
 ```bash
 mvn clean package
