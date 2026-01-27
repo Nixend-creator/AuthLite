@@ -1,6 +1,5 @@
 # AuthLite
 
-[![Build Status](https://github.com/N1xend/AuthLite/actions/workflows/build.yml/badge.svg)](https://github.com/N1xend/AuthLite/actions)
 ![Paper 1.21.1](https://img.shields.io/badge/Paper-1.21.1-green)
 ![Java 21](https://img.shields.io/badge/Java-21-orange)
 ![License](https://img.shields.io/github/license/N1xend/AuthLite)
