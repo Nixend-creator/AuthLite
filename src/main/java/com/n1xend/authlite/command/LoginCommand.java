@@ -43,6 +43,18 @@ public class LoginCommand implements CommandExecutor {
 
         if (BCrypt.verifyer().verify(inputPass.toCharArray(), storedHash).verified) {
             plugin.setLoggedIn(player.getUniqueId(), true);
+			
+			 // === ДОБАВЬ ЭТОТ БЛОК ===
+    if (plugin.getConfig().getBoolean("auto-login.enabled", true)) {
+        long durationHours = plugin.getConfig().getLong("auto-login.duration-hours", 24);
+        long expiresAt = System.currentTimeMillis() + TimeUnit.HOURS.toMillis(durationHours);
+        String ip = player.getAddress().getAddress().getHostAddress();
+        String ipHash = plugin.getStorage().hashIp(ip);
+        String token = java.util.UUID.randomUUID().toString();
+        plugin.getStorage().saveAutoLogin(player.getUniqueId().toString(), token, expiresAt, ipHash);
+    }
+    // ======================
+			
             plugin.getSessionLogger().log("LOGIN_SUCCESS", 
                 java.util.Map.of("PLAYER", player.getName(), "UUID", player.getUniqueId().toString()));
             player.sendMessage(mm.deserialize(getPrefix() + "<green>Welcome! You are now logged in."));
