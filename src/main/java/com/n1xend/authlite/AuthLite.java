@@ -2,10 +2,12 @@ package com.n1xend.authlite;
 
 import com.n1xend.authlite.command.*;
 import com.n1xend.authlite.listener.PlayerLoginListener;
+import com.n1xend.authlite.session.SessionManager;
 import com.n1xend.authlite.listener.SessionLoggerListener;
 import com.n1xend.authlite.storage.StorageProvider;
 import com.n1xend.authlite.storage.YamlStorage;
 import org.bukkit.plugin.java.JavaPlugin;
+
 
 import java.io.File;
 import java.util.UUID;
@@ -19,6 +21,11 @@ public class AuthLite extends JavaPlugin {
 
     @Override
     public void onEnable() {
+		this.sessionManager = new SessionManager();
+		this.getServer().getPluginManager().registerEvents(
+        new PlayerLoginListener(this, sessionManager), 
+        this
+    );
         instance = this;
         logger = getLogger();
         
