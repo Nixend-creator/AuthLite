@@ -29,6 +29,7 @@ modules.add(new PlaceholderApiSupportModule(plugin));
 modules.add(new SandboxModeModule(plugin));
 modules.add(new AutoRecoveryModule(plugin));
 modules.add(new PopularPluginsIntegrationModule(plugin));
+modules.add(new RestrictedUserProtectionModule(plugin));
     }
 
     public void loadAll() {

@@ -32,6 +32,29 @@ logging:
     max-size-mb: 10
     max-age-days: 7
     rotation-enabled: true
+    
+security:
+  restricted-users:
+    enabled: true
+    entries:
+      - "server_land;127.0.0.1"
+      - "server;127.0.0.1"
+      - "bukkit;127.0.0.1"
+      - "purpur;127.0.0.1"
+      - "system;127.0.0.1"
+      - "admin;127.0.0.1"
+      - "md_5;127.0.0.1"
+      - "administrator;127.0.0.1"
+      - "notch;127.0.0.1"
+      - "spigot;127.0.0.1"
+      - "bukkitcraft;127.0.0.1"
+      - "paperclip;127.0.0.1"
+      - "papermc;127.0.0.1"
+      - "spigotmc;127.0.0.1"
+      - "root;127.0.0.1"
+      - "console;127.0.0.1"
+      - "authme;127.0.0.1"
+      - "owner;127.0.0.1"
 
 modules:
   core-auth: true
@@ -44,3 +67,4 @@ modules:
   emergency-session-revoke: true
   ip-account-limit: true
   popular-plugins-integration: true
+  restricted-user-protection: true
