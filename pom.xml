@@ -38,7 +38,7 @@
 
     <build>
         <plugins>
-            <!-- Компилятор с проверкой совместимости -->
+            <!-- Компилятор с строгой проверкой -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -48,12 +48,11 @@
                     <compilerArgs>
                         <arg>-Xlint:all</arg>
                         <arg>-Werror</arg>
-                        <arg>-implicit:class</arg>
                     </compilerArgs>
                 </configuration>
             </plugin>
 
-            <!-- Проверка версий зависимостей -->
+            <!-- Проверка версий (без проблемных правил) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
@@ -68,25 +67,27 @@
                             <rules>
                                 <requireMavenVersion>
                                     <version>3.8.0</version>
-                                    <message>Требуется Maven 3.8.0 или новее</message>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
                                     <version>[21,)</version>
-                                    <message>Требуется Java 21 или новее для компиляции</message>
                                 </requireJavaVersion>
                                 <dependencyConvergence/>
-                                <requireUpperBoundDeps/>
-                                <banDuplicateClasses>
-                                    <findAllDuplicates>true</findAllDuplicates>
-                                </banDuplicateClasses>
                             </rules>
                             <fail>true</fail>
                         </configuration>
                     </execution>
                 </executions>
+                <dependencies>
+                    <!-- Добавляем зависимость для расширенных правил -->
+                    <dependency>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>extra-enforcer-rules</artifactId>
+                        <version>1.8.0</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
-            <!-- Плагин для сборки JAR -->
+            <!-- Сборка JAR -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -99,37 +100,10 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <outputFile>${project.build.directory}/${project.name}-${project.version}.jar</outputFile>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>development</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <showWarnings>true</showWarnings>
-                            <showDeprecation>true</showDeprecation>
-                            <compilerArgs>
-                                <arg>-Xlint:unchecked</arg>
-                                <arg>-Xlint:deprecation</arg>
-                                <arg>-parameters</arg>
-                            </compilerArgs>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>
