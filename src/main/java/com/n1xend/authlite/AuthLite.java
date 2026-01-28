@@ -1,55 +1,74 @@
 package com.n1xend.authlite;
 
-import com.n1xend.authlite.module.ModuleManager;
+import com.n1xend.authlite.command.*;
+import com.n1xend.authlite.listener.PlayerLoginListener;
+import com.n1xend.authlite.listener.SessionLoggerListener;
 import com.n1xend.authlite.storage.StorageProvider;
 import com.n1xend.authlite.storage.YamlStorage;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.File;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 public class AuthLite extends JavaPlugin {
     private StorageProvider storage;
-    private ModuleManager moduleManager;
-    private final Map<UUID, Boolean> loggedIn = new HashMap<>();
+    private SessionLogger sessionLogger;
+    private static AuthLite instance;
+    private Logger logger;
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
-        saveResource("messages_en.yml", false);
-        saveResource("messages_ru.yml", false);
-        saveResource("messages_uk.yml", false);
-        saveResource("messages_de.yml", false);
-        saveResource("messages_es.yml", false);
-
-        storage = new YamlStorage(this);
-        moduleManager = new ModuleManager(this);
-        moduleManager.loadModules(); // ← Исправлено: было loadAll()
-        moduleManager.enableModules();
-
-        getLogger().info("AuthLite v" + getDescription().getVersion() + " enabled!");
+        instance = this;
+        logger = getLogger();
+        
+        // Создаём директорию данных
+        getDataFolder().mkdirs();
+        
+        // Инициализация хранилища
+        File authDataFile = new File(getDataFolder(), "auth.yml");
+        File sessionsFile = new File(getDataFolder(), "sessions.yml");
+        this.storage = new YamlStorage(authDataFile, sessionsFile);
+        
+        // Инициализация логгера сессий
+        this.sessionLogger = new SessionLogger(this, sessionsFile);
+        
+        // Регистрация команд
+        getCommand("register").setExecutor(new RegisterCommand(this));
+        getCommand("login").setExecutor(new LoginCommand(this));
+        getCommand("changepassword").setExecutor(new ChangePasswordCommand(this));
+        getCommand("authsessions").setExecutor(new AuthSessionsCommand(this));
+        
+        // Регистрация листенеров
+        getServer().getPluginManager().registerEvents(new PlayerLoginListener(this), this);
+        getServer().getPluginManager().registerEvents(new SessionLoggerListener(this), this);
+        
+        logger.info("AuthLite успешно загружен!");
     }
 
     @Override
     public void onDisable() {
-        loggedIn.clear();
+        logger.info("AuthLite выгружен.");
     }
 
+    // Геттеры для доступа из команд и листенеров
     public StorageProvider getStorage() {
         return storage;
     }
 
-    public boolean isLoggedIn(UUID uuid) {
-        return Boolean.TRUE.equals(loggedIn.get(uuid));
+    public SessionLogger getSessionLogger() {
+        return sessionLogger;
     }
 
-    public void setLoggedIn(UUID uuid, boolean status) {
-        loggedIn.put(uuid, status);
+    public long getLastPasswordChange(UUID uuid) {
+        return storage.getLastPasswordChange(uuid);
     }
 
-    // ← Добавлен геттер
-    public ModuleManager getModuleManager() {
-        return moduleManager;
+    public void setLastPasswordChange(UUID uuid, long timestamp) {
+        storage.setLastPasswordChange(uuid, timestamp);
+    }
+
+    public static AuthLite getInstance() {
+        return instance;
     }
 }

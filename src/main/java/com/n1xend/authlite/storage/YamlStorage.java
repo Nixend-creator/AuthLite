@@ -1,86 +1,128 @@
 package com.n1xend.authlite.storage;
 
-import com.n1xend.authlite.AuthLite;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
+import java.util.UUID;
+import java.util.logging.Level;
 
 public class YamlStorage implements StorageProvider {
-    private final AuthLite plugin;
-    private final File playersFile;
-    private YamlConfiguration playersConfig;
+    private final File authFile;
+    private final File sessionsFile;
+    private final FileConfiguration authConfig;
+    private final FileConfiguration sessionsConfig;
+    private final JavaPlugin plugin;
 
-    public YamlStorage(AuthLite plugin) {
-        this.plugin = plugin;
-        this.playersFile = new File(plugin.getDataFolder(), "players.yml");
-        reloadPlayersConfig();
-    }
-
-    private void reloadPlayersConfig() {
-        if (!playersFile.exists()) {
-            plugin.saveResource("players.yml", false);
+    public YamlStorage(File authFile, File sessionsFile) {
+        this.authFile = authFile;
+        this.sessionsFile = sessionsFile;
+        this.plugin = JavaPlugin.getPlugin(JavaPlugin.class);
+        
+        // Создаём файлы если не существуют
+        if (!authFile.exists()) {
+            try {
+                authFile.createNewFile();
+            } catch (IOException e) {
+                plugin.getLogger().log(Level.SEVERE, "Не удалось создать auth.yml", e);
+            }
         }
-        playersConfig = YamlConfiguration.loadConfiguration(playersFile);
+        if (!sessionsFile.exists()) {
+            try {
+                sessionsFile.createNewFile();
+            } catch (IOException e) {
+                plugin.getLogger().log(Level.SEVERE, "Не удалось создать sessions.yml", e);
+            }
+        }
+        
+        this.authConfig = YamlConfiguration.loadConfiguration(authFile);
+        this.sessionsConfig = YamlConfiguration.loadConfiguration(sessionsFile);
     }
 
-    private void savePlayersConfig() {
+    @Override
+    public boolean isRegistered(String username) {
+        return authConfig.contains(username + ".password");
+    }
+
+    @Override
+    public String getPasswordHash(String username) {
+        return authConfig.getString(username + ".password");
+    }
+
+    @Override
+    public String getSalt(String username) {
+        return authConfig.getString(username + ".salt", "");
+    }
+
+    @Override
+    public void savePasswordHash(String username, String passwordHash, String salt) {
+        authConfig.set(username + ".password", passwordHash);
+        authConfig.set(username + ".salt", salt);
+        saveAuthFile();
+    }
+
+    @Override
+    public void logAuth(String username) {
+        plugin.getLogger().info("[AuthLite] Пользователь аутентифицирован: " + username);
+    }
+
+    @Override
+    public long getLastPasswordChange(UUID uuid) {
+        return sessionsConfig.getLong("sessions." + uuid.toString() + ".lastPasswordChange", 0L);
+    }
+
+    @Override
+    public void setLastPasswordChange(UUID uuid, long timestamp) {
+        sessionsConfig.set("sessions." + uuid.toString() + ".lastPasswordChange", timestamp);
+        saveSessionsFile();
+    }
+
+    @Override
+    public AutoLoginData getAutoLoginData(String username) {
+        String path = username + ".autoLogin";
+        if (!authConfig.contains(path)) return null;
+        
+        String ip = authConfig.getString(path + ".ip");
+        long expires = authConfig.getLong(path + ".expires", 0L);
+        
+        if (ip == null || expires <= System.currentTimeMillis()) {
+            authConfig.set(path, null);
+            saveAuthFile();
+            return null;
+        }
+        
+        return new AutoLoginData(ip, expires);
+    }
+
+    @Override
+    public void saveAutoLoginData(String username, String ipAddress, long expiresAt) {
+        String path = username + ".autoLogin";
+        authConfig.set(path + ".ip", ipAddress);
+        authConfig.set(path + ".expires", expiresAt);
+        saveAuthFile();
+    }
+
+    @Override
+    public boolean hasAutoLogin(String username, String ipAddress) {
+        AutoLoginData data = getAutoLoginData(username);
+        return data != null && data.ipAddress().equals(ipAddress);
+    }
+
+    private void saveAuthFile() {
         try {
-            playersConfig.save(playersFile);
+            authConfig.save(authFile);
         } catch (IOException e) {
-            plugin.getLogger().severe("Could not save players.yml: " + e.getMessage());
+            plugin.getLogger().log(Level.WARNING, "Ошибка сохранения auth.yml", e);
         }
     }
 
-    @Override
-    public String getPasswordHash(String uuid) {
-        return playersConfig.getString(uuid + ".password");
-    }
-
-    @Override
-    public void savePasswordHash(String uuid, String passwordHash) {
-        playersConfig.set(uuid + ".password", passwordHash);
-        savePlayersConfig();
-    }
-
-    @Override
-    public void saveAutoLogin(String uuid, String token, long expiresAt, String ipHash) {
-        playersConfig.set(uuid + ".auto-login.token", token);
-        playersConfig.set(uuid + ".auto-login.expires-at", expiresAt);
-        playersConfig.set(uuid + ".auto-login.ip-hash", ipHash);
-        savePlayersConfig();
-    }
-
-    @Override
-    public AutoLoginData getAutoLoginData(String uuid) {
-        String token = playersConfig.getString(uuid + ".auto-login.token");
-        if (token == null) return null;
-        long expiresAt = playersConfig.getLong(uuid + ".auto-login.expires-at");
-        String ipHash = playersConfig.getString(uuid + ".auto-login.ip-hash");
-        return new AutoLoginData(token, expiresAt, ipHash);
-    }
-
-    @Override
-    public String hashIp(String ip) {
-        return Integer.toString(ip.hashCode());
-    }
-
-    @Override
-    public void logBruteForce(String message) {
-        // Можно реализовать запись в bruteforce.log
-    }
-
-    // Вложенный класс для данных автологина
-    public static class AutoLoginData {
-        public final String token;
-        public final long expiresAt;
-        public final String ipHash;
-
-        public AutoLoginData(String token, long expiresAt, String ipHash) {
-            this.token = token;
-            this.expiresAt = expiresAt;
-            this.ipHash = ipHash;
+    private void saveSessionsFile() {
+        try {
+            sessionsConfig.save(sessionsFile);
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.WARNING, "Ошибка сохранения sessions.yml", e);
         }
     }
 }

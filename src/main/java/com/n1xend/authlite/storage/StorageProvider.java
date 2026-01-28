@@ -1,25 +1,28 @@
 package com.n1xend.authlite.storage;
 
-public interface StorageProvider {
-    boolean hasAccount(String uuid);
-    String getPasswordHash(String uuid);
-    void savePasswordHash(String uuid, String hash, String ip);
-    int getAccountCountByIp(String ip);
-    AutoLoginData getAutoLoginData(String uuid);
-    void saveAutoLogin(String uuid, String token, long expiresAt, String ipHash);
-    void clearAutoLogin(String uuid);
-    void logAuth(String message);
-    void logBruteForce(String message);
-    String hashIp(String ip);
+import java.util.UUID;
 
-    class AutoLoginData {
-        public final String token;
-        public final long expiresAt;
-        public final String ipHash;
-        public AutoLoginData(String token, long expiresAt, String ipHash) {
-            this.token = token;
-            this.expiresAt = expiresAt;
-            this.ipHash = ipHash;
-        }
-    }
+public interface StorageProvider {
+    
+    boolean isRegistered(String username);
+    
+    String getPasswordHash(String username);
+    
+    String getSalt(String username);
+    
+    void savePasswordHash(String username, String passwordHash, String salt);
+    
+    void logAuth(String username);
+    
+    long getLastPasswordChange(UUID uuid);
+    
+    void setLastPasswordChange(UUID uuid, long timestamp);
+    
+    record AutoLoginData(String ipAddress, long expiresAt) {}
+    
+    AutoLoginData getAutoLoginData(String username);
+    
+    void saveAutoLoginData(String username, String ipAddress, long expiresAt);
+    
+    boolean hasAutoLogin(String username, String ipAddress);
 }

@@ -1,33 +1,53 @@
 package com.n1xend.authlite;
 
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+
+import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.time.Instant;
-import java.util.Map;
+import java.util.UUID;
+import java.util.logging.Level;
 
 public class SessionLogger {
-    private final Path logPath;
+    private final AuthLite plugin;
+    private final File sessionsFile;
+    private final FileConfiguration sessionsConfig;
 
-    public SessionLogger(AuthLite plugin) {
-        Path dir = plugin.getDataFolder().toPath().resolve("logs");
-        try { Files.createDirectories(dir); } catch (IOException ignored) {}
-        this.logPath = dir.resolve("sessions.log");
+    public SessionLogger(AuthLite plugin, File sessionsFile) {
+        this.plugin = plugin;
+        this.sessionsFile = sessionsFile;
+        this.sessionsConfig = YamlConfiguration.loadConfiguration(sessionsFile);
     }
 
-    public void log(String event, Map<String, String> fields) {
-        String line = "[" + Instant.now() + "] EVENT=" + event;
-        for (var entry : fields.entrySet()) {
-            line += " " + entry.getKey() + "=" + entry.getValue();
+    public void logLogin(Player player) {
+        UUID uuid = player.getUniqueId();
+        String path = "sessions." + uuid.toString();
+        
+        sessionsConfig.set(path + ".username", player.getName());
+        sessionsConfig.set(path + ".ip", player.getAddress().getAddress().getHostAddress());
+        sessionsConfig.set(path + ".loginTime", System.currentTimeMillis());
+        sessionsConfig.set(path + ".logoutTime", null);
+        
+        saveSessions();
+        plugin.getStorage().logAuth(player.getName());
+    }
+
+    public void logLogout(Player player) {
+        UUID uuid = player.getUniqueId();
+        String path = "sessions." + uuid.toString();
+        
+        if (sessionsConfig.contains(path)) {
+            sessionsConfig.set(path + ".logoutTime", System.currentTimeMillis());
+            saveSessions();
         }
-        try {
-            Files.write(logPath, (line + System.lineSeparator()).getBytes(StandardCharsets.UTF_8),
-                StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-        } catch (IOException ignored) {}
     }
 
-    public Path getCurrentLogPath() { return logPath; }
+    private void saveSessions() {
+        try {
+            sessionsConfig.save(sessionsFile);
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.WARNING, "Ошибка сохранения сессий", e);
+        }
+    }
 }
