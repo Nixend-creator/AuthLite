@@ -1,28 +1,29 @@
 package com.n1xend.authlite.storage;
 
-import java.util.UUID;
+import java.util.Map;
+import java.util.Optional;
 
 public interface StorageProvider {
-    
-    boolean isRegistered(String username);
-    
-    String getPasswordHash(String username);
-    
-    String getSalt(String username);
-    
-    void savePasswordHash(String username, String passwordHash, String salt);
-    
-    void logAuth(String username);
-    
-    long getLastPasswordChange(UUID uuid);
-    
-    void setLastPasswordChange(UUID uuid, long timestamp);
-    
-    record AutoLoginData(String ipAddress, long expiresAt) {}
-    
-    AutoLoginData getAutoLoginData(String username);
-    
-    void saveAutoLoginData(String username, String ipAddress, long expiresAt);
-    
-    boolean hasAutoLogin(String username, String ipAddress);
+
+    // --- Пароли ---
+    void savePasswordHash(String username, String passwordHash, String ipHash);
+    Optional<String> getPasswordHash(String username);
+
+    // --- Автовход ---
+    record AutoLoginData(String token, long expiresAt) {}
+    void saveAutoLogin(String username, String token, long expiresAt, String ipHash);
+    Optional<AutoLoginData> getAutoLogin(String username);
+    boolean hasAutoLogin(String username, String ipHash);
+    void removeAutoLogin(String username);
+
+    // --- IP-аккаунты ---
+    int getAccountCountByIp(String ipHash);
+    void incrementAccountCount(String ipHash);
+    void decrementAccountCount(String ipHash);
+
+    // --- Брутфорс ---
+    void logBruteForce(String ipHash);
+
+    // --- Утилиты ---
+    String hashIp(String ip);
 }
