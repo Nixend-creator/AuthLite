@@ -62,10 +62,10 @@ public class RegisterCommand implements CommandExecutor {
         }
 
         String hashed = BCrypt.withDefaults().hashToString(12, pass1.toCharArray());
-        plugin.getStorage().savePasswordHash(uuid, hashed);
+        plugin.getStorage().savePasswordHash(uuid, hashed); // ← 2 аргумента
         plugin.setLoggedIn(player.getUniqueId(), true);
 
-        // === Назначение группы после регистрации ===
+        // ← Исправлено: getModuleManager() теперь существует
         DefaultGroupAssignmentModule groupModule = plugin.getModuleManager().getModule(DefaultGroupAssignmentModule.class);
         if (groupModule != null) {
             groupModule.assignDefaultGroup(player);

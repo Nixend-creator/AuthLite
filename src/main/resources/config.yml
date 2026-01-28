@@ -35,15 +35,8 @@ logging:
 
 security:
   default-group:
-    # Группа, в которую попадает игрок после регистрации
-    group: "default"
-    # Резервные команды, если нет LuckPerms/Vault
-    fallback-commands:
-      - "lp user {player} parent add {group}"
-      # Для GroupManager:
-      # - "manuadd {player} {group}"
-      # Для PermissionsEx:
-      # - "pex user {player} group set {group}"
+    commands:
+      - "lp user {player} parent add default"
     
 security:
   restricted-users:
@@ -80,4 +73,4 @@ modules:
   ip-account-limit: true
   popular-plugins-integration: true
   restricted-user-protection: true
-  default-group-assignment: true  # ← установи true, чтобы включить
+  default-group-assignment: false  # ← установи true, чтобы включить

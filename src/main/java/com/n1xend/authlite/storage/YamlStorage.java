@@ -39,12 +39,11 @@ public class YamlStorage implements StorageProvider {
     }
 
     @Override
-    public void savePasswordHash(String uuid, String hash, String ip) {
-        dataConfig.set(uuid + ".password", hash);
-        String ipHash = hashIp(ip);
-        dataConfig.set(uuid + ".ip-hash", ipHash);
-        incrementIpCount(ipHash);
-        save();
+    public void savePasswordHash(String uuid, String passwordHash) {
+    // Убери третий параметр (ip)
+    playersConfig.set(uuid + ".password", passwordHash);
+    savePlayersConfig();
+}
     }
 
     private void incrementIpCount(String ipHash) {
